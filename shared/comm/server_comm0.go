@@ -1,6 +1,6 @@
 //go:build wasm
 
-package communication
+package comm
 
 import (
 	"encoding/json"
@@ -18,6 +18,7 @@ func Call(api string, params ...any) *Promise {
 
 	promise := NewPromise()
 	//defer close(promise.resultChan)
+
 	// Convert params to JSON
 	jsonParams := []byte("[]")
 	if len(params) > 0 {

@@ -1,12 +1,13 @@
 //go:build wasm
 
-package communication
+package comm
 
 import (
 	"syscall/js"
 )
 
-var funcs []func()
+var funcs map[int]func() = make(map[int]func())
+var id int = -1
 
 //export onclick
 func onclick(id int) {
@@ -14,8 +15,14 @@ func onclick(id int) {
 }
 
 func RegisterFunc(fn func()) int {
-	funcs = append(funcs, fn)
-	return len(funcs) - 1
+	id++
+	funcs[id] = fn
+	return id
+}
+
+func RegisterElement() int {
+	id++
+	return id
 }
 
 func InvokeFunc(id int) {

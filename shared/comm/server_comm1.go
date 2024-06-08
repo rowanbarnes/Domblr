@@ -1,6 +1,6 @@
 //go:build !wasm
 
-package communication
+package comm
 
 type ApiCallback func([]any, error)
 type ApiRouter map[string]func(...any) ([]any, error)
