@@ -1,7 +1,7 @@
 package widget
 
 import (
-	"Domblr/shared/communication"
+	"Domblr/shared/comm"
 	"bytes"
 	"strconv"
 )
@@ -9,8 +9,8 @@ import (
 type Button struct {
 	Label   string
 	OnClick func(button *Button)
-	id      int
 	Style   *Style
+	id      int
 }
 
 func (button *Button) Render(buffer *bytes.Buffer) *bytes.Buffer {
@@ -29,7 +29,7 @@ func (button *Button) Setup(style *Style) {
 		button.Style = style
 	}
 
-	button.id = communication.RegisterFunc(func() {
+	button.id = comm.RegisterFunc(func() {
 		button.OnClick(button)
 	})
 }
@@ -38,5 +38,5 @@ func (button *Button) SetLabel(Label string) {
 	button.Label = Label
 	var buffer bytes.Buffer
 	button.Render(&buffer)
-	communication.UpdateWidget(button.id, buffer.String())
+	comm.UpdateWidget(button.id, buffer.String())
 }

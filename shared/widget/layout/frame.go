@@ -16,9 +16,10 @@ type Frame struct {
 }
 
 func (frame *Frame) Render(buffer *bytes.Buffer) *bytes.Buffer {
-	buffer.WriteString(`<div style="display: flex; align-items: stretch; flex-direction: column">`)
+	buffer.WriteString(`<div style="display: flex; flex-direction: column; height: 100%;">`)
 	widget.Render(frame.Top, buffer)
-	buffer.WriteString(`<div style="display: flex; align-items: stretch; flex-direction: row">`)
+	buffer.WriteString(`</div>`)
+	buffer.WriteString(`<div style="display: flex; flex-direction: row; flex: 1;">`)
 	widget.Render(frame.Left, buffer)
 	widget.Render(frame.Body, buffer)
 	widget.Render(frame.Right, buffer)

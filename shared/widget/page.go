@@ -23,18 +23,18 @@ func (page *Page) Setup(style *Style) {
 
 func (page *Page) Render(buffer *bytes.Buffer) *bytes.Buffer {
 	buffer.WriteString(`<!DOCTYPE html>`)
-	buffer.WriteString(`<html lang="">`)
+	buffer.WriteString(`<html lang="" style="height: 100%;">`)
 	buffer.WriteString(`<head>`)
 	buffer.WriteString(`<title>`)
 	buffer.WriteString(page.Title)
 	buffer.WriteString(`</title>`)
 	buffer.WriteString("<script src=\"wasm_exec.js\"></script>")
 	buffer.WriteString(`</head>`)
-	buffer.WriteString(`<body>`)
+	buffer.WriteString(`<body style = "margin: 0; height: 100%;">`)
 	page.Body.Render(buffer)
+	buffer.WriteString(headStr)
 	buffer.WriteString(`</body>`)
 	buffer.WriteString(`</html>`)
-	buffer.WriteString(headStr)
 
 	return buffer
 }

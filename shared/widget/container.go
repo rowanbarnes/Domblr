@@ -10,7 +10,7 @@ type Container struct {
 }
 
 func (container *Container) Render(buffer *bytes.Buffer) *bytes.Buffer {
-	buffer.WriteString("<div style=\"background-color: " + container.Style.Style[BgColor] + "\">")
+	buffer.WriteString("<div style=\"background-color: " + container.Style.Style[BgColor] + "; flex: auto;\">")
 	Render(container.Body, buffer)
 	buffer.WriteString("</div>")
 	return buffer

@@ -2,7 +2,7 @@ package backend
 
 import (
 	"Domblr/frontend"
-	"Domblr/shared/communication"
+	"Domblr/shared/comm"
 	"bytes"
 	"encoding/json"
 	"net/http"
@@ -24,7 +24,7 @@ func (server *Server) InvokeRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	println("requestName: ", requestName)
+	println("Request name: ", requestName)
 
 	// Parse request body to get parameters
 	var params []any
@@ -35,7 +35,7 @@ func (server *Server) InvokeRequest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Invoke the handler function with parameters
-	response, err := handler() //params...)
+	response, err := handler(params...)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -60,11 +60,11 @@ func (server *Server) InvokeRequest(w http.ResponseWriter, r *http.Request) {
 
 type Server struct {
 	Addr      string
-	ApiRouter communication.ApiRouter
+	ApiRouter comm.ApiRouter
 }
 
 func (server *Server) Setup() {
-	communication.Api = server.ApiRouter
+	comm.Api = server.ApiRouter
 }
 
 // Serve begins serving the given application
@@ -80,6 +80,7 @@ func (server *Server) Serve(app *frontend.App) {
 	http.HandleFunc("/api/", server.InvokeRequest)
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		var buffer bytes.Buffer
+		app.URL = r.URL
 		app.Page.Render(&buffer)
 		_, err := w.Write(buffer.Bytes())
 		if err != nil {

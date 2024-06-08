@@ -1,6 +1,8 @@
 package widget
 
-import "bytes"
+import (
+	"bytes"
+)
 
 type P struct {
 	Text  string
