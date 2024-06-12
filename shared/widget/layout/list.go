@@ -1,6 +1,7 @@
 package layout
 
 import (
+	"Domblr/shared/comm"
 	"Domblr/shared/widget"
 	"bytes"
 )
@@ -14,31 +15,40 @@ type List struct {
 	ItemCount   int
 	ItemBuilder func(int) widget.Widget
 	Axis        int
-	Children    []widget.Widget
 	Style       *widget.Style
-}
-
-func (list *List) Render(buffer *bytes.Buffer) *bytes.Buffer {
-	buffer.WriteString(`<div style="display: flex; align-items: stretch; flex-direction: `)
-	if list.Axis == ROW {
-		buffer.WriteString("row")
-	} else if list.Axis == COL {
-		buffer.WriteString("column")
-	}
-	buffer.WriteString("\">")
-	for i := range list.Children {
-		list.Children[i].Render(buffer)
-	}
-	buffer.WriteString(`</div>`)
-	return buffer
+	children    []widget.Widget
+	id          int
 }
 
 func (list *List) Setup(style *widget.Style) {
 	widget.Inherit(&list.Style, style)
+	list.id = comm.RegisterElement()
 
 	for i := 0; i < list.ItemCount; i++ {
-		child := list.ItemBuilder(i)
+		child := &ListItem{Body: list.ItemBuilder(i)}
+		list.children = append(list.children, child)
 		child.Setup(list.Style)
-		list.Children = append(list.Children, child)
 	}
+}
+
+func (list *List) Design(buffer *bytes.Buffer) *bytes.Buffer {
+	list.Style.Design(buffer, list.id, "", map[int]string{}, map[string]string{
+		"display":    "flex",
+		"list-style": "none",
+	})
+	for i := range list.children {
+		list.children[i].Design(buffer)
+	}
+
+	return buffer
+}
+
+func (list *List) Render(buffer *bytes.Buffer) *bytes.Buffer {
+	widget.OpenTag(buffer, "ul", "", list.id, false)
+	for i := range list.children {
+		list.children[i].Render(buffer)
+	}
+	widget.CloseTag(buffer, "ul")
+
+	return buffer
 }

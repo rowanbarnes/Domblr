@@ -6,8 +6,8 @@ import (
 	"syscall/js"
 )
 
-var funcs map[int]func() = make(map[int]func())
-var id int = -1
+var funcs = make(map[int]func())
+var id = -1
 
 //export onclick
 func onclick(id int) {

@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 )
 
 type Request struct {
@@ -16,6 +17,7 @@ type Request struct {
 type App struct {
 	Addr string
 	Page *widget.Page
+	URL  *url.URL
 }
 
 func (app *App) Get(api string, params ...any) error {

@@ -2,12 +2,12 @@
 
 package comm
 
-var id int = -1
+var id = -1
 
-func onclick(...any) {
+func onclick(_ ...any) {
 }
 
-func RegisterFunc(...any) int {
+func RegisterFunc(_ ...any) int {
 	id++
 	return id
 }
@@ -17,8 +17,8 @@ func RegisterElement() int {
 	return id
 }
 
-func InvokeFunc(...any) {
+func InvokeFunc(_ ...any) {
 }
 
-func UpdateWidget(...any) {
+func UpdateWidget(_ ...any) {
 }

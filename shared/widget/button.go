@@ -3,7 +3,6 @@ package widget
 import (
 	"Domblr/shared/comm"
 	"bytes"
-	"strconv"
 )
 
 type Button struct {
@@ -11,17 +10,6 @@ type Button struct {
 	OnClick func(button *Button)
 	Style   *Style
 	id      int
-}
-
-func (button *Button) Render(buffer *bytes.Buffer) *bytes.Buffer {
-	buffer.WriteString("<button id=\"")
-	buffer.WriteString(strconv.Itoa(button.id))
-	buffer.WriteString("\" onclick=\"wasm.exports.onclick(")
-	buffer.WriteString(strconv.Itoa(button.id))
-	buffer.WriteString(")\">")
-	buffer.WriteString(button.Label)
-	buffer.WriteString("</button>")
-	return buffer
 }
 
 func (button *Button) Setup(style *Style) {
@@ -32,6 +20,33 @@ func (button *Button) Setup(style *Style) {
 	button.id = comm.RegisterFunc(func() {
 		button.OnClick(button)
 	})
+}
+
+func (button *Button) Design(buffer *bytes.Buffer) *bytes.Buffer {
+	button.Style.Design(buffer, button.id, "",
+		map[int]string{
+			Foreground: "color",
+			Padding:    "padding",
+		}, map[string]string{
+			"text-decoration": "none",
+		},
+	)
+
+	button.Style.Design(buffer, button.id, "hover",
+		map[int]string{
+			Highlight: "color",
+		},
+		map[string]string{},
+	)
+
+	return buffer
+}
+
+func (button *Button) Render(buffer *bytes.Buffer) *bytes.Buffer {
+	OpenTag(buffer, "a", "#", button.id, true)
+	buffer.WriteString(button.Label)
+	CloseTag(buffer, "a")
+	return buffer
 }
 
 func (button *Button) SetLabel(Label string) {
