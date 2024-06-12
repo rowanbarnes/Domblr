@@ -32,10 +32,19 @@ func (list *List) Setup(style *widget.Style) {
 }
 
 func (list *List) Design(buffer *bytes.Buffer) *bytes.Buffer {
-	list.Style.Design(buffer, list.id, "", map[int]string{}, map[string]string{
-		"display":    "flex",
-		"list-style": "none",
-	})
+	minorAxis := "height"
+	if list.Axis == COL {
+		minorAxis = "width"
+	}
+
+	list.Style.Design(buffer, list.id, "",
+		map[int]string{},
+		map[string]string{
+			"display":    "flex",
+			"list-style": "none",
+			minorAxis:    "fit-content",
+		},
+	)
 	for i := range list.children {
 		list.children[i].Design(buffer)
 	}

@@ -4,13 +4,26 @@ DOM assembler web framework using GoLang WASM. Combines the whole web stack into
 
 ## Goals
 
+### Efficiency
+
 - Build small WASM files with TinyGo and wasm-opt
+- Perform as much computation as possible on the backend before serving to the frontend
+- Serve the least content possible for first paint, then slowly stream other data (e.g. WASM file)
+
+### Programmability
+
 - Provide a framework for writing pure Go web applications supporting the backend and frontend
 - Simplify the integration of frontend and backend with a Java RMI-inspired API system
-- Perform as much computation as possible on the backend before serving to the frontend
 - Make the developer feel like they are writing one application, rather than many disjointed codesets
 - Automate the process of intelligently dividing responsibilities
 - Provide a system for declaratively specifying the widget tree, routes, dynamic behaviour and API endpoints
+
+### Sensible Widget Constraints (WIP)
+
+- Widgets expand to parent's constraints on its minor and/or major axis (`100%`)
+- Widgets can shrink to child (`fit-content`)
+- Widgets can give a specific size (`?px`)
+- Behind the scenes, flexbox mode is exclusively used for simplicity
 
 ## Considerations
 
@@ -18,9 +31,12 @@ DOM assembler web framework using GoLang WASM. Combines the whole web stack into
 - The chance of backend code being leaked into the WASM binary and causing security nightmares is very real and not much of a concern at this stage 
 - This project is mainly an experiment
 
-## TODO
 
-1. Fill out the widgets to produce good-looking pages
-2. Generate separate CSS files
-3. Add a router to dynamically handle links
-4. ...?
+## TODO
+- [ ] Fill out the widgets to produce good-looking pages 
+- [x] Generate separate CSS files 
+- [ ] Add a router to dynamically handle links
+- [ ] Refactor into library with reasonable programmability (reflection?)
+- [ ] ...everything else
+- [ ] Fix security nightmares (code leakage) during WASM compilation
+- [ ] Optimize file sizes, minification, compression, etc

@@ -42,7 +42,6 @@ func (list *FlexList) Design(buffer *bytes.Buffer) *bytes.Buffer {
 		map[int]string{
 			widget.Background: "background-color",
 		}, map[string]string{
-			"display":         "flex",
 			"justify-content": "space-between",
 			"align-items":     "center",
 			"flex-direction":  flexDir,

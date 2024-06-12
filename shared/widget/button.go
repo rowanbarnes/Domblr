@@ -30,7 +30,6 @@ func (button *Button) Design(buffer *bytes.Buffer) *bytes.Buffer {
 			Padding:    "padding",
 		}, map[string]string{
 			"text-decoration": "none",
-			"display":         "block",
 			"position":        "relative",
 		},
 	)
@@ -46,7 +45,7 @@ func (button *Button) Design(buffer *bytes.Buffer) *bytes.Buffer {
 	// Design underline styling
 	button.Style.Design(buffer, button.id, "::before",
 		map[int]string{
-			Foreground: "background-color",
+			Highlight: "background-color",
 		},
 		map[string]string{
 			"content":    "\"\"",
