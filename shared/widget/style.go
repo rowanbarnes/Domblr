@@ -32,11 +32,11 @@ type Style struct {
 
 func (s *Style) Design(buffer *bytes.Buffer, id int, pseudo string,
 	transform map[int]string, specific map[string]string) {
-	// Write the signature `.s$id:$pseudo{`
+
+	// Write the signature `.s$id$pseudo{`
 	buffer.WriteString(".s")
 	buffer.WriteString(strconv.Itoa(id))
 	if pseudo != "" {
-		buffer.WriteString(":")
 		buffer.WriteString(pseudo)
 	}
 	buffer.WriteString("{")

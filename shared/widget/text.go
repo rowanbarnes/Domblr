@@ -15,6 +15,10 @@ func (p *P) Setup(style *Style) {
 	}
 }
 
+func (p *P) Design(buffer *bytes.Buffer) *bytes.Buffer {
+	return buffer
+}
+
 func (p *P) Render(buffer *bytes.Buffer) *bytes.Buffer {
 	buffer.WriteString(`<p>`)
 	buffer.WriteString(p.Text)

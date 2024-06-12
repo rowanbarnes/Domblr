@@ -31,14 +31,25 @@ func (list *FlexList) Setup(style *widget.Style) {
 }
 
 func (list *FlexList) Design(buffer *bytes.Buffer) *bytes.Buffer {
+	// Create local variables for dependent properties
+	flexDir := "row"
+	if list.Axis == COL {
+		flexDir = "column"
+	}
+
+	// Design the list styles
 	list.Style.Design(buffer, list.id, "",
 		map[int]string{
 			widget.Background: "background-color",
 		}, map[string]string{
+			"display":         "flex",
 			"justify-content": "space-between",
 			"align-items":     "center",
+			"flex-direction":  flexDir,
 		},
 	)
+
+	// Design list children
 	for i := range list.Children {
 		list.Children[i].Design(buffer)
 	}
