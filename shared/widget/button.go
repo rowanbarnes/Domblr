@@ -2,6 +2,7 @@ package widget
 
 import (
 	"Domblr/shared/comm"
+	"Domblr/util"
 	"bytes"
 )
 
@@ -14,7 +15,7 @@ type Button struct {
 	Style map[int]string
 }
 
-func (b *Button) Setup(parent *Node, id int) {
+func (b *Button) Setup(parent *Node, id int) error {
 	// Initialize Node
 	b.Node = Node{
 		Structure: Structure{
@@ -57,12 +58,13 @@ func (b *Button) Setup(parent *Node, id int) {
 			Variables: b.Style,
 		},
 	}
-	b.Node.Setup(parent, id)
+	util.Panic(b.Node.Setup(parent, id))
 
 	// Register OnClick
 	comm.RegisterFunc(id, func() {
 		b.OnClick(b)
 	})
+	return nil
 }
 
 // SetLabel changes the label of the button and renders the widget
@@ -73,5 +75,5 @@ func (b *Button) SetLabel(Label string) {
 	b.Render(&css, &html)
 
 	// TODO: Handle changing css
-	comm.UpdateWidget(b.id, html.String())
+	comm.UpdateWidget(b.ID, html.String())
 }

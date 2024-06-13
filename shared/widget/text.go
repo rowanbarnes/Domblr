@@ -1,16 +1,22 @@
 package widget
 
+import (
+	"Domblr/util"
+)
+
 type P struct {
 	Node
 	Text string
 }
 
-func (p *P) Setup(parent *Node, id int) {
+func (p *P) Setup(parent *Node, id int) error {
 	p.Node = Node{
 		Structure: Structure{
 			Tag:   "p",
 			Inner: p.Text,
 		},
 	}
-	p.Node.Setup(parent, id)
+	util.Panic(p.Node.Setup(parent, id))
+
+	return nil
 }

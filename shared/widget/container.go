@@ -1,5 +1,9 @@
 package widget
 
+import (
+	"Domblr/util"
+)
+
 type Container struct {
 	Node
 	// Body is the contents of the container
@@ -10,7 +14,7 @@ type Container struct {
 	Style map[int]string
 }
 
-func (c *Container) Setup(parent *Node, id int) {
+func (c *Container) Setup(parent *Node, id int) error {
 	// Initialize the Node
 	c.Node = Node{
 		Structure: Structure{
@@ -26,5 +30,7 @@ func (c *Container) Setup(parent *Node, id int) {
 		},
 		Children: []Widget{c.Body},
 	}
-	c.Node.Setup(parent, id)
+	util.Panic(c.Node.Setup(parent, id))
+
+	return nil
 }

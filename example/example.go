@@ -8,11 +8,13 @@ import (
 	"fmt"
 )
 
-func ButtonApp() *frontend.App {
+func CommunicationApp() *frontend.App {
 	return &frontend.App{
 		Addr: "http://localhost:8080",
 		Page: &widget.Page{
-			Title: "Hello World Title",
+			Config: widget.Config{
+				Title: "Backend/Frontend Communication Example",
+			},
 			Body: &widget.List{
 				ItemCount: 5,
 				ItemBuilder: func(i int) widget.Widget {
@@ -30,7 +32,7 @@ func ButtonApp() *frontend.App {
 	}
 }
 
-func ButtonServer() *backend.Server {
+func CommunicationServer() *backend.Server {
 	return &backend.Server{
 		Addr: ":8080",
 		ApiRouter: comm.ApiRouter{

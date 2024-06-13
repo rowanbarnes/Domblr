@@ -15,7 +15,7 @@ type Structure struct {
 }
 
 func (s *Structure) Render(css *bytes.Buffer, html *bytes.Buffer, n *Node) {
-	s.openTag(html, n.id)
+	s.openTag(html, n.ID)
 	html.WriteString(s.Inner)
 	for _, child := range n.Children {
 		child.Render(css, html)
@@ -31,7 +31,7 @@ func (s *Structure) openTag(html *bytes.Buffer, id int) {
 		html.WriteString(s.Href)
 		html.WriteString("\"")
 	}
-	html.WriteString(" id=\"")
+	html.WriteString(" ID=\"")
 	html.WriteString(strconv.Itoa(id))
 	html.WriteString("\" class=\"")
 	html.WriteString(util.ItoABase26(id))

@@ -1,6 +1,7 @@
 package widget
 
 import (
+	"Domblr/util"
 	"bytes"
 	"slices"
 )
@@ -13,15 +14,15 @@ type Node struct {
 	Style
 	// Children holds the widgets that have been added to this node and setup
 	Children []Widget
-	// id the identifier of this node, used for ids and classes
-	id int
+	// ID the identifier of this node, used for ids and classes
+	ID int
 	// descendants is the number of nodes in the subtree rooted at this Node
 	descendants int
 }
 
-// Setup sets the nodes' id and inherits style properties from its parent.
-func (n *Node) Setup(parent *Node, id int) {
-	n.id = id
+// Setup sets the nodes' ID and inherits style properties from its parent.
+func (n *Node) Setup(parent *Node, id int) error {
+	n.ID = id
 	n.descendants = 1
 	if parent != nil {
 		n.Style.Setup(&parent.Style)
@@ -39,15 +40,17 @@ func (n *Node) Setup(parent *Node, id int) {
 
 	// Setup children
 	for _, c := range n.Children {
-		c.Setup(n, n.id+n.descendants)
+		util.Panic(c.Setup(n, n.ID+n.descendants))
 		n.descendants += c.GetDescendants()
 		n.Collect(c.GetConstraint())
 	}
+
+	return nil
 }
 
 // Render outputs CSS and HTML code to the given relevant buffers.
 func (n *Node) Render(css *bytes.Buffer, html *bytes.Buffer) {
-	n.Style.Render(css, n.id)
+	n.Style.Render(css, n.ID)
 	n.Structure.Render(css, html, n)
 }
 

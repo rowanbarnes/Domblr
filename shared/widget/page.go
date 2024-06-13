@@ -2,47 +2,43 @@ package widget
 
 import (
 	"Domblr/res"
+	"Domblr/util"
 	"bytes"
 	_ "embed"
+	"text/template"
 )
 
-// Page TODO: make a widget?
-type Page struct {
+type Config struct {
 	Title string
-	Body  Widget
+	CSS   string
+	HTML  string
+}
+
+// Page widget
+type Page struct {
+	Config Config
+	Body   Widget
 	// Style contains Variables for setting the look of widgets
 	// Nullable after Setup
 	Style map[int]string
 }
 
-func (page *Page) Setup(style map[int]string) {
-	page.Body.Setup(nil, 0)
+func (p *Page) Setup(style map[int]string) {
+	// Initialize the Node
+	// TODO consider making Page a Widget and make use of given default style
+	util.Panic(p.Body.Setup(nil, 0))
 }
 
-func (page *Page) Render(buffer *bytes.Buffer) {
+func (p *Page) Render(buffer *bytes.Buffer) {
 	// Render the css and html code
 	var css, html bytes.Buffer
-	page.Body.Render(&css, &html)
+	p.Body.Render(&css, &html)
+	p.Config.CSS = css.String()
+	p.Config.HTML = html.String()
 
 	// Write the boilerplate document and the rendered css/html
-	// TODO cleanup boilerplate code, use a template or file of some kind
-	buffer.WriteString(`<!DOCTYPE html>`)
-	buffer.WriteString(`<html lang="">`)
-	buffer.WriteString(`<head>`)
-	buffer.WriteString(`<title>`)
-	buffer.WriteString(page.Title)
-	buffer.WriteString(`</title>`)
-	buffer.WriteString(`<script src="wasm_exec.js"></script>`)
-	buffer.WriteString(`<style>`)
-	buffer.WriteString(res.GlobalStyles)
-	buffer.Write(css.Bytes())
-	buffer.WriteString(`</style>`)
-	buffer.WriteString(`</head>`)
-	buffer.WriteString(`<body>`)
-	buffer.Write(html.Bytes())
-	buffer.WriteString(`<script>`)
-	buffer.WriteString(res.LauncherScript)
-	buffer.WriteString(`</script>`)
-	buffer.WriteString(`</body>`)
-	buffer.WriteString(`</html>`)
+	tmpl, err := template.New("boilerplate").Parse(res.BoilerplateHTML)
+	util.Panic(err)
+	err = tmpl.Execute(buffer, p.Config)
+	util.Panic(err)
 }

@@ -2,6 +2,7 @@ package widget
 
 import (
 	"Domblr/util"
+	"errors"
 )
 
 // Options for Axis
@@ -33,7 +34,7 @@ type listItem struct {
 	Body Widget
 }
 
-func (li *listItem) Setup(parent *Node, id int) {
+func (li *listItem) Setup(parent *Node, id int) error {
 	// Initialize the Node
 	li.Node = Node{
 		Structure: Structure{
@@ -41,15 +42,15 @@ func (li *listItem) Setup(parent *Node, id int) {
 		},
 		Children: []Widget{li.Body},
 	}
-	li.Node.Setup(parent, id)
+	util.Panic(li.Node.Setup(parent, id))
+
+	return nil
 }
 
-func (l *List) Setup(parent *Node, id int) {
+func (l *List) Setup(parent *Node, id int) error {
 	// Ensure ItemBuilder is initialized
 	if l.ItemBuilder == nil && (l.Items == nil || len(l.Items) < l.ItemCount) {
-		// TODO: throw error
-		println("FlexList setup error: ItemBuilder is nil")
-		return
+		return errors.New("list incorrectly declared: ItemBuilder is nil")
 	}
 
 	// Construct the remaining children and add them to Items
@@ -91,5 +92,7 @@ func (l *List) Setup(parent *Node, id int) {
 		},
 		Children: l.Items,
 	}
-	l.Node.Setup(parent, id)
+	util.Panic(l.Node.Setup(parent, id))
+
+	return nil
 }
