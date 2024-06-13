@@ -15,6 +15,12 @@ func (p *P) Setup(parent *Node, id int) error {
 			Tag:   "p",
 			Inner: p.Text,
 		},
+		Style: Style{
+			Properties: map[string]map[string]any{"": {
+				"color":   Foreground,
+				"padding": Padding,
+			}},
+		},
 	}
 	util.Panic(p.Node.Setup(parent, id))
 

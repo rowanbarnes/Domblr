@@ -15,12 +15,17 @@ type Structure struct {
 }
 
 func (s *Structure) Render(css *bytes.Buffer, html *bytes.Buffer, n *Node) {
-	s.openTag(html, n.ID)
+	if s.Tag != "" {
+		s.openTag(html, n.ID)
+	}
 	html.WriteString(s.Inner)
 	for _, child := range n.Children {
 		child.Render(css, html)
 	}
-	s.closeTag(html)
+	if s.Tag != "" {
+		s.closeTag(html)
+	}
+
 }
 
 func (s *Structure) openTag(html *bytes.Buffer, id int) {
@@ -31,7 +36,7 @@ func (s *Structure) openTag(html *bytes.Buffer, id int) {
 		html.WriteString(s.Href)
 		html.WriteString("\"")
 	}
-	html.WriteString(" ID=\"")
+	html.WriteString(" id=\"")
 	html.WriteString(strconv.Itoa(id))
 	html.WriteString("\" class=\"")
 	html.WriteString(util.ItoABase26(id))

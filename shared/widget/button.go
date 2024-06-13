@@ -25,10 +25,6 @@ func (b *Button) Setup(parent *Node, id int) error {
 			Onclick: true,
 		},
 		Style: Style{
-			Constraint: Constraint{
-				Width:  SHRINK,
-				Height: SHRINK,
-			},
 			Properties: map[string]map[string]any{
 				"": {
 					"color":           Foreground,

@@ -17,6 +17,13 @@ const (
 	UL
 )
 
+// Options for justify-contents
+const (
+	START = iota
+	CENTER
+	END
+)
+
 type List struct {
 	Node
 	Items       []Widget
