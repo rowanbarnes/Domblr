@@ -18,12 +18,21 @@ DOM assembler web framework using GoLang WASM. Combines the whole web stack into
 - Automate the process of intelligently dividing responsibilities
 - Provide a system for declaratively specifying the widget tree, routes, dynamic behaviour and API endpoints
 
-### Sensible Widget Constraints (WIP)
+#### Composition Justification
+
+- Widgets are all created by their struct to give the programmer named parameters
+- Widgets setup by tree traversal, ingesting the parameters stored in the struct
+- Widgets compose the behaviours required to render the CSS & HTML
+
+#### Sensible Widget Constraints (WIP)
 
 - Widgets expand to parent's constraints on its minor and/or major axis (`100%`)
 - Widgets can shrink to child (`fit-content`)
 - Widgets can give a specific size (`?px`)
 - Behind the scenes, flexbox mode is exclusively used for simplicity
+- shrink(expand) = expand(expand)
+  - Constraint is passed up tree, affecting CSS of parent
+- expand(shrink) = expand(shrink + empty space)?
 
 ## Considerations
 

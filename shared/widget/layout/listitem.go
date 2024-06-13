@@ -18,7 +18,7 @@ func (listitem *ListItem) Setup(style *widget.Style) {
 	widget.Setup(listitem.Body, listitem.Style)
 }
 
-func (listitem *ListItem) Design(buffer *bytes.Buffer) *bytes.Buffer {
+func (listitem *ListItem) Design(buffer *bytes.Buffer) widget.Constraint {
 	listitem.Style.Design(buffer, listitem.id, "",
 		map[int]string{},
 		map[string]string{
@@ -27,13 +27,12 @@ func (listitem *ListItem) Design(buffer *bytes.Buffer) *bytes.Buffer {
 		},
 	)
 	widget.Design(listitem.Body, buffer)
-	return buffer
 }
 
-func (listitem *ListItem) Render(buffer *bytes.Buffer) *bytes.Buffer {
+func (listitem *ListItem) Render(buffer *bytes.Buffer) {
 	widget.OpenTag(buffer, "li", "", listitem.id, false)
 	widget.Render(listitem.Body, buffer)
 	widget.CloseTag(buffer, "li")
 
-	return buffer
+	return
 }

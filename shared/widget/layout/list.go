@@ -31,7 +31,7 @@ func (list *List) Setup(style *widget.Style) {
 	}
 }
 
-func (list *List) Design(buffer *bytes.Buffer) *bytes.Buffer {
+func (list *List) Design(buffer *bytes.Buffer) widget.Constraint {
 	minorAxis := "height"
 	if list.Axis == COL {
 		minorAxis = "width"
@@ -49,15 +49,15 @@ func (list *List) Design(buffer *bytes.Buffer) *bytes.Buffer {
 		list.children[i].Design(buffer)
 	}
 
-	return buffer
+	return buffer,
 }
 
-func (list *List) Render(buffer *bytes.Buffer) *bytes.Buffer {
+func (list *List) Render(buffer *bytes.Buffer) {
 	widget.OpenTag(buffer, "ul", "", list.id, false)
 	for i := range list.children {
 		list.children[i].Render(buffer)
 	}
 	widget.CloseTag(buffer, "ul")
 
-	return buffer
+	return
 }

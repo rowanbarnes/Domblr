@@ -22,7 +22,7 @@ func (button *Button) Setup(style *Style) {
 	})
 }
 
-func (button *Button) Design(buffer *bytes.Buffer) *bytes.Buffer {
+func (button *Button) Design(buffer *bytes.Buffer) Constraint {
 	// Design the button styling
 	button.Style.Design(buffer, button.id, "",
 		map[int]string{
@@ -73,14 +73,17 @@ func (button *Button) Design(buffer *bytes.Buffer) *bytes.Buffer {
 		},
 	)
 
-	return buffer
+	return Constraint{
+		Width:  SHRINK,
+		Height: SHRINK,
+	}
 }
 
-func (button *Button) Render(buffer *bytes.Buffer) *bytes.Buffer {
+func (button *Button) Render(buffer *bytes.Buffer) {
 	OpenTag(buffer, "a", "#", button.id, true)
 	buffer.WriteString(button.Label)
 	CloseTag(buffer, "a")
-	return buffer
+	return
 }
 
 func (button *Button) SetLabel(Label string) {

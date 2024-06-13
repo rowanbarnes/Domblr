@@ -23,14 +23,21 @@ const (
 )
 
 type Style struct {
-	MinWidth  int
-	MaxWidth  int
-	MinHeight int
-	MaxHeight int
-	Style     map[int]string
+	Constraint
+	inherited map[int]string
+
 }
 
-func (s *Style) Design(buffer *bytes.Buffer, id int, pseudo string,
+func (s *Style) Inherit(parent *Style) {
+	// Copy over the style attributes that the parent has but not the child
+	for i, p := range parent.inherited {
+		if _, ok := s.inherited[i]; !ok {
+			s.inherited[i] = p
+		}
+	}
+}
+
+func (s *Style) Render(buffer *bytes.Buffer, id int, pseudo string,
 	transform map[int]string, specific map[string]string) {
 
 	// Write the signature `.s$id$pseudo{`
@@ -41,9 +48,9 @@ func (s *Style) Design(buffer *bytes.Buffer, id int, pseudo string,
 	}
 	buffer.WriteString("{")
 
-	// Write the transformed properties
+	// Write the transformed inherited
 	for key, property := range transform {
-		if value, ok := s.Style[key]; ok {
+		if value, ok := s.inherited[key]; ok {
 			buffer.WriteString(property)
 			buffer.WriteString(":")
 			buffer.WriteString(value)
@@ -61,21 +68,4 @@ func (s *Style) Design(buffer *bytes.Buffer, id int, pseudo string,
 
 	// Close the block `}`
 	buffer.WriteString("}")
-}
-
-func Inherit(c **Style, parent *Style) {
-	// Handle nil Style
-	if *c == nil {
-		*c = parent
-	} else {
-		// Populate size styles
-		// TODO (*c).M
-	}
-
-	// Copy over the style attributes that the parent has but not the child
-	for i, s := range parent.Style {
-		if _, ok := (*c).Style[i]; !ok {
-			(*c).Style[i] = s
-		}
-	}
 }

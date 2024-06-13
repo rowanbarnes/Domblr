@@ -18,7 +18,7 @@ func (container *Container) Setup(style *Style) {
 	Setup(container.Body, container.Style)
 }
 
-func (container *Container) Design(buffer *bytes.Buffer) *bytes.Buffer {
+func (container *Container) Design(buffer *bytes.Buffer) Constraint {
 	container.Style.Design(buffer, container.id, "",
 		map[int]string{
 			Background: "background-color",
@@ -28,13 +28,13 @@ func (container *Container) Design(buffer *bytes.Buffer) *bytes.Buffer {
 	)
 
 	Design(container.Body, buffer)
-	return buffer
+	return buffer,
 }
 
-func (container *Container) Render(buffer *bytes.Buffer) *bytes.Buffer {
+func (container *Container) Render(buffer *bytes.Buffer) {
 	OpenTag(buffer, "div", "", container.id, false)
 	Render(container.Body, buffer)
 	CloseTag(buffer, "div")
 
-	return buffer
+	return
 }

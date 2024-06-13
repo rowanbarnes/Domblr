@@ -1,6 +1,7 @@
 package widget
 
 import (
+	"Domblr/res"
 	"bytes"
 	_ "embed"
 )
@@ -11,44 +12,38 @@ type Page struct {
 	Style *Style
 }
 
-//go:embed script.html
-var scriptStr string
-
-//go:embed style.css
-var styleStr string
-
 func (page *Page) Setup(style *Style) {
 	if page.Style == nil {
 		page.Style = style
 	}
 
-	page.Body.Setup(page.Style)
+	page.Body.Setup(nil, 0)
 }
 
-func (page *Page) Design(buffer *bytes.Buffer) *bytes.Buffer {
-	page.Body.Design(buffer)
+func (page *Page) Render(buffer *bytes.Buffer) {
+	// Render the css and html code
+	var css, html bytes.Buffer
+	page.Body.Render(&css, &html)
 
-	return buffer
-}
-
-func (page *Page) Render(buffer *bytes.Buffer) *bytes.Buffer {
+	// Write the boilerplate document and the rendered css/html
+	// TODO cleanup boilerplate code, use a template or file of some kind
 	buffer.WriteString(`<!DOCTYPE html>`)
 	buffer.WriteString(`<html lang="">`)
 	buffer.WriteString(`<head>`)
 	buffer.WriteString(`<title>`)
 	buffer.WriteString(page.Title)
 	buffer.WriteString(`</title>`)
-	buffer.WriteString("<script src=\"wasm_exec.js\"></script>")
-	buffer.WriteString("<style>")
-	buffer.WriteString(styleStr)
-	page.Design(buffer)
-	buffer.WriteString("</style>")
+	buffer.WriteString(`<script src="wasm_exec.js"></script>`)
+	buffer.WriteString(`<style>`)
+	buffer.WriteString(res.GlobalStyles)
+	buffer.Write(css.Bytes())
+	buffer.WriteString(`</style>`)
 	buffer.WriteString(`</head>`)
 	buffer.WriteString(`<body>`)
-	page.Body.Render(buffer)
-	buffer.WriteString(scriptStr)
+	buffer.Write(html.Bytes())
+	buffer.WriteString(`<script>`)
+	buffer.WriteString(res.LauncherScript)
+	buffer.WriteString(`</script>`)
 	buffer.WriteString(`</body>`)
 	buffer.WriteString(`</html>`)
-
-	return buffer
 }
