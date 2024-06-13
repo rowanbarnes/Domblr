@@ -10,13 +10,6 @@ type Node struct {
 	Structure
 	// Style represents the CSS styling of this node
 	*Style
-	// TODO consider removing constraint
-	// The same behaviour could be achieved without storing the constraint
-	// data. Instead, it could be passed as a pointer up the tree and modified as it
-	// goes.
-	// Although, it might be handy to have a copy of each nodes' constraints in the
-	// future.
-	*Constraint
 	// children holds the widgets that have been added to this node and setup
 	children []Widget
 	// id the identifier of this node, used for ids and classes
@@ -35,11 +28,8 @@ func (n *Node) Setup(parent *Node, id int) {
 
 // Render outputs CSS and HTML code to the given relevant buffers.
 func (n *Node) Render(css *bytes.Buffer, html *bytes.Buffer) {
-	n.Style.Render(css, n.id, "", map[int]string{}, map[string]string{})
-	n.Structure.Render(html)
-	for _, child := range n.children {
-		child.Render(css, html)
-	}
+	n.Style.Render(css, n.id)
+	n.Structure.Render(css, html, n)
 }
 
 // AddChild adds a child widget to the node.
@@ -49,5 +39,5 @@ func (n *Node) AddChild(child ...Widget) {
 
 // GetConstraint returns this nodes' constraint
 func (n *Node) GetConstraint() *Constraint {
-	return n.Constraint
+	return &n.Style.Constraint
 }

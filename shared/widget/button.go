@@ -6,10 +6,9 @@ import (
 )
 
 type Button struct {
+	Node
 	Label   string
 	OnClick func(button *Button)
-	Style   *Style
-	id      int
 }
 
 func (button *Button) Setup(style *Style) {

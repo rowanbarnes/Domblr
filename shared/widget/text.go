@@ -1,27 +1,21 @@
 package widget
 
-import (
-	"bytes"
-)
-
 type P struct {
-	Text  string
-	Style *Style
+	Node
+	Text string
 }
 
-func (p *P) Setup(style *Style) {
-	if p.Style == nil {
-		p.Style = style
+func (p *P) Setup(parent *Node, id int) {
+	p.Node = Node{
+		Structure: Structure{
+			Tag: "p",
+		},
+		Style: &Style{
+			Constraint: Constraint{
+				Width:  SHRINK,
+				Height: SHRINK,
+			},
+		},
 	}
-}
-
-func (p *P) Design(buffer *bytes.Buffer) Constraint {
-	return buffer,
-}
-
-func (p *P) Render(buffer *bytes.Buffer) {
-	buffer.WriteString(`<p>`)
-	buffer.WriteString(p.Text)
-	buffer.WriteString(`</p>`)
-	return
+	p.Node.Setup(parent, id)
 }

@@ -3,6 +3,7 @@
 package comm
 
 import (
+	"Domblr/util"
 	"encoding/json"
 	"errors"
 	"syscall/js"
@@ -13,10 +14,10 @@ type ApiRouter map[string]func(...any) ([]any, error)
 
 var Api ApiRouter
 
-func Call(api string, params ...any) *Promise {
+func Call(api string, params ...any) *util.Promise {
 	println("Call()")
 
-	promise := NewPromise()
+	promise := util.NewPromise()
 	//defer close(promise.resultChan)
 
 	// Convert params to JSON
