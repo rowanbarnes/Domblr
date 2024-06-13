@@ -6,6 +6,7 @@ import (
 	_ "embed"
 )
 
+// Page TODO: make a widget?
 type Page struct {
 	Title string
 	Body  Widget
@@ -15,7 +16,6 @@ type Page struct {
 }
 
 func (page *Page) Setup(style map[int]string) {
-	// TODO use style here
 	page.Body.Setup(nil, 0)
 }
 

@@ -5,7 +5,6 @@ import (
 	"Domblr/frontend"
 	"Domblr/shared/comm"
 	"Domblr/shared/widget"
-	"Domblr/shared/widget/layout"
 	"fmt"
 )
 
@@ -14,7 +13,7 @@ func ButtonApp() *frontend.App {
 		Addr: "http://localhost:8080",
 		Page: &widget.Page{
 			Title: "Hello World Title",
-			Body: &layout.List{
+			Body: &widget.List{
 				ItemCount: 5,
 				ItemBuilder: func(i int) widget.Widget {
 					return &widget.Button{
