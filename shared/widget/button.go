@@ -9,17 +9,21 @@ type Button struct {
 	Node
 	Label   string
 	OnClick func(button *Button)
+	// Style contains Variables for setting the look of widgets
+	// Nullable after Setup
+	Style map[int]string
 }
 
 func (b *Button) Setup(parent *Node, id int) {
-	// Set up the node
+	// Initialize Node
 	b.Node = Node{
 		Structure: Structure{
 			Tag:     "a",
 			Href:    "#",
+			Inner:   b.Label,
 			Onclick: true,
 		},
-		Style: &Style{
+		Style: Style{
 			Constraint: Constraint{
 				Width:  SHRINK,
 				Height: SHRINK,
@@ -50,21 +54,21 @@ func (b *Button) Setup(parent *Node, id int) {
 					"transform": "scaleX(1)",
 				},
 			},
+			Variables: b.Style,
 		},
 	}
+	b.Node.Setup(parent, id)
 
 	// Register OnClick
 	comm.RegisterFunc(id, func() {
 		b.OnClick(b)
 	})
-
-	// Setup the node
-	b.Node.Setup(parent, id)
 }
 
 // SetLabel changes the label of the button and renders the widget
 func (b *Button) SetLabel(Label string) {
 	b.Label = Label
+	b.Structure.Inner = Label
 	var css, html bytes.Buffer
 	b.Render(&css, &html)
 

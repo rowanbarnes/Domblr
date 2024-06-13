@@ -14,7 +14,6 @@ func ButtonApp() *frontend.App {
 		Addr: "http://localhost:8080",
 		Page: &widget.Page{
 			Title: "Hello World Title",
-			Style: &widget.Style{},
 			Body: &layout.List{
 				ItemCount: 5,
 				ItemBuilder: func(i int) widget.Widget {

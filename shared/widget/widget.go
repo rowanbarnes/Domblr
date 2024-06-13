@@ -12,4 +12,6 @@ type Widget interface {
 	Render(css *bytes.Buffer, html *bytes.Buffer)
 	// GetConstraint returns the widget's constraints
 	GetConstraint() *Constraint
+	// GetDescendants returns the number of children in this widget
+	GetDescendants() int
 }

@@ -12,36 +12,48 @@ type FlexList struct {
 	ItemCount   int
 	ItemBuilder func(int) widget.Widget
 	Axis        int
+	// Style contains variables for setting the look of widgets
+	// Nullable after Setup
+	Style map[int]string
 }
 
 func (l *FlexList) Setup(parent *widget.Node, id int) {
-	// Set up the node
+	// Ensure ItemBuilder is initialized
+	if l.ItemBuilder == nil && (l.Items == nil || len(l.Items) < l.ItemCount) {
+		// TODO: throw error
+		println("FlexList setup error: ItemBuilder is nil")
+		return
+	}
+
+	// Construct the remaining children and add them to Items
+	if l.Items == nil {
+		l.Items = make([]widget.Widget, l.ItemCount)
+	}
+	for i := len(l.Items); i < l.ItemCount; i++ {
+		l.Items = append(l.Items, l.ItemBuilder(i))
+	}
+
+	// Initialize Node
 	l.Node = widget.Node{
 		Structure: widget.Structure{
 			Tag: "div",
 		},
-		Style: &widget.Style{
+		Style: widget.Style{
 			Properties: map[string]map[string]any{
 				"": {
 					"background-color": widget.Background,
-					"justify-content":  "space-between",
-					"align-items":      "center",
-					"flex-direction":   util.If(l.Axis == ROW, "row", "column"),
+					//"justify-content":  "space-between", // TODO add some field to switch
+					//"align-items":    "center",
+					"flex-direction": util.If(l.Axis == ROW, "row", "column"),
 				},
 			},
 			Constraint: widget.Constraint{
-				Width:  util.If(l.Axis == COL, widget.SHRINK, widget.EXPAND),
-				Height: util.If(l.Axis == ROW, widget.SHRINK, widget.EXPAND),
+				Width:  util.If(l.Axis == ROW, widget.EXPAND, widget.SHRINK),
+				Height: util.If(l.Axis == COL, widget.EXPAND, widget.SHRINK),
 			},
+			Variables: l.Style,
 		},
+		Children: l.Items,
 	}
-
-	// Construct the required children and add them to the node
-	l.Node.AddChild(l.Items...)
-	for i := len(l.Items); i < l.ItemCount; i++ {
-		l.Node.AddChild(l.ItemBuilder(i))
-	}
-
-	// Set up the node
 	l.Node.Setup(parent, id)
 }

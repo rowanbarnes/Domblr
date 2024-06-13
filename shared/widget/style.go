@@ -26,22 +26,32 @@ type Style struct {
 	// Constraint composes the layout constraints into Style
 	Constraint
 	// Properties contains CSS properties in the form:
-	// {`pseudo` : {`property` : inherited variable | `value`}}
+	// {`pseudo` : {`property` : var (int) | `value`}}
 	Properties map[string]map[string]any
-	// inherited style variables
-	inherited map[int]string
+	// Variables holds the inherited styles
+	Variables map[int]string
 }
 
-func (s *Style) Inherit(parent *Style) {
+func (s *Style) Setup(parent *Style) {
+	// Initialize Properties
+	if s.Properties == nil {
+		s.Properties = make(map[string]map[string]any)
+	}
+
+	// Initialize Variables
+	if s.Variables == nil {
+		s.Variables = make(map[int]string)
+	}
+
 	// Handle nil parent
 	if parent == nil {
 		return
 	}
 
-	// Copy over the style attributes that the parent has but not the child
-	for i, p := range parent.inherited {
-		if _, ok := s.inherited[i]; !ok {
-			s.inherited[i] = p
+	// Inherit style Variables from the parent
+	for i, p := range parent.Variables {
+		if _, ok := s.Variables[i]; !ok {
+			s.Variables[i] = p
 		}
 	}
 }
@@ -50,28 +60,30 @@ func (s *Style) Inherit(parent *Style) {
 // TODO optimize the rendering to not create redundant blocks
 func (s *Style) Render(css *bytes.Buffer, id int) {
 	// Write the custom styles for each pseudo class
-	for pseudo, v := range s.Properties {
+	for pseudo, pseudoProps := range s.Properties {
 		// Write the signature `.s$id$pseudo{`
-		css.WriteString(".s")
+		css.WriteString(".")
 		css.WriteString(util.ItoABase26(id))
 		css.WriteString(pseudo)
 		css.WriteString("{")
 
 		// Write the custom styles to the pseudo
-		for property, value := range v {
-			css.WriteString(property)
-			css.WriteString(":")
-
-			// Write either the raw value or inherited variable
+		// Write either the raw string value or the retrieved Variables' variable
+		for property, value := range pseudoProps {
 			switch value.(type) {
 			case string:
+				css.WriteString(property)
+				css.WriteString(":")
 				css.WriteString(value.(string))
+				css.WriteString(";")
 			case int:
-				if value, ok := s.inherited[value.(int)]; ok {
-					css.WriteString(value)
+				if varValue, ok := s.Variables[value.(int)]; ok {
+					css.WriteString(property)
+					css.WriteString(":")
+					css.WriteString(varValue)
+					css.WriteString(";")
 				}
 			}
-			css.WriteString(";")
 		}
 
 		// Close the block `}`
@@ -79,12 +91,12 @@ func (s *Style) Render(css *bytes.Buffer, id int) {
 	}
 
 	// Write the constraint styles
-	css.WriteString(".s")
+	css.WriteString(".")
 	css.WriteString(util.ItoABase26(id))
 	css.WriteString("{")
 	css.WriteString("width:")
 	css.WriteString(util.If(s.Constraint.Width == SHRINK, "fit-content", "100%"))
-	css.WriteString(";width:")
+	css.WriteString(";height:")
 	css.WriteString(util.If(s.Constraint.Height == SHRINK, "fit-content", "100%"))
 	css.WriteString(";}")
 }

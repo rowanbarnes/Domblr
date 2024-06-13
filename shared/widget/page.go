@@ -9,14 +9,13 @@ import (
 type Page struct {
 	Title string
 	Body  Widget
-	Style *Style
+	// Style contains Variables for setting the look of widgets
+	// Nullable after Setup
+	Style map[int]string
 }
 
-func (page *Page) Setup(style *Style) {
-	if page.Style == nil {
-		page.Style = style
-	}
-
+func (page *Page) Setup(style map[int]string) {
+	// TODO use style here
 	page.Body.Setup(nil, 0)
 }
 
