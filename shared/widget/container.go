@@ -1,40 +1,27 @@
 package widget
 
-import (
-	"Domblr/shared/comm"
-	"bytes"
-)
-
 type Container struct {
-	Body  Widget
-	Style *Style
-	id    int
+	Node
+	Body Widget
 }
 
-func (container *Container) Setup(style *Style) {
-	Inherit(&container.Style, style)
-	container.id = comm.RegisterElement()
-
-	Setup(container.Body, container.Style)
-}
-
-func (container *Container) Design(buffer *bytes.Buffer) Constraint {
-	container.Style.Design(buffer, container.id, "",
-		map[int]string{
-			Background: "background-color",
-		}, map[string]string{
-			"flex": "auto",
+func (c *Container) Setup(parent *Node, id int) {
+	c.Node = Node{
+		Structure: Structure{
+			Tag: "div",
 		},
-	)
+		Style: &Style{
+			Constraint: Constraint{
+				Width:  SHRINK,
+				Height: SHRINK,
+			},
+			Properties: map[string]map[string]any{
+				"": {
+					"background-color": Background,
+				},
+			},
+		},
+	}
 
-	Design(container.Body, buffer)
-	return buffer,
-}
-
-func (container *Container) Render(buffer *bytes.Buffer) {
-	OpenTag(buffer, "div", "", container.id, false)
-	Render(container.Body, buffer)
-	CloseTag(buffer, "div")
-
-	return
+	c.Node.Setup(parent, id)
 }

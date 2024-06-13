@@ -7,26 +7,14 @@ import (
 )
 
 var funcs = make(map[int]func())
-var id = -1
 
-//export onclick
-func onclick(id int) {
-	InvokeFunc(id)
-}
-
-func RegisterFunc(fn func()) int {
-	id++
-	funcs[id] = fn
-	return id
-}
-
-func RegisterElement() int {
-	id++
-	return id
-}
-
-func InvokeFunc(id int) {
+//export invoke
+func invoke(id int) {
 	funcs[id]()
+}
+
+func RegisterFunc(id int, fn func()) {
+	funcs[id] = fn
 }
 
 func UpdateWidget(id int, html string) {

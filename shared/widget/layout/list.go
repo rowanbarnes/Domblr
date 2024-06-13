@@ -1,9 +1,8 @@
 package layout
 
 import (
-	"Domblr/shared/comm"
 	"Domblr/shared/widget"
-	"bytes"
+	"Domblr/util"
 )
 
 const (
@@ -12,52 +11,39 @@ const (
 )
 
 type List struct {
+	widget.Node
 	ItemCount   int
 	ItemBuilder func(int) widget.Widget
 	Axis        int
-	Style       *widget.Style
-	children    []widget.Widget
-	id          int
 }
 
-func (list *List) Setup(style *widget.Style) {
-	widget.Inherit(&list.Style, style)
-	list.id = comm.RegisterElement()
-
-	for i := 0; i < list.ItemCount; i++ {
-		child := &ListItem{Body: list.ItemBuilder(i)}
-		list.children = append(list.children, child)
-		child.Setup(list.Style)
-	}
-}
-
-func (list *List) Design(buffer *bytes.Buffer) widget.Constraint {
-	minorAxis := "height"
-	if list.Axis == COL {
-		minorAxis = "width"
-	}
-
-	list.Style.Design(buffer, list.id, "",
-		map[int]string{},
-		map[string]string{
-			"display":    "flex",
-			"list-style": "none",
-			minorAxis:    "fit-content",
+func (l *List) Setup(parent *widget.Node, id int) {
+	// Set up the node
+	l.Node = widget.Node{
+		Structure: widget.Structure{
+			Tag: "ul",
 		},
-	)
-	for i := range list.children {
-		list.children[i].Design(buffer)
+		Style: &widget.Style{
+			Properties: map[string]map[string]any{
+				"": {
+					"background-color": widget.Background,
+					"justify-content":  "space-between",
+					"align-items":      "center",
+					"flex-direction":   util.If(l.Axis == ROW, "row", "column"),
+				},
+			},
+			Constraint: widget.Constraint{
+				Width:  util.If(l.Axis == COL, widget.SHRINK, widget.EXPAND),
+				Height: util.If(l.Axis == ROW, widget.SHRINK, widget.EXPAND),
+			},
+		},
 	}
 
-	return buffer,
-}
-
-func (list *List) Render(buffer *bytes.Buffer) {
-	widget.OpenTag(buffer, "ul", "", list.id, false)
-	for i := range list.children {
-		list.children[i].Render(buffer)
+	// Construct the children and add them to the node
+	for i := 0; i < l.ItemCount; i++ {
+		l.Node.AddChild(&ListItem{Body: l.ItemBuilder(i)})
 	}
-	widget.CloseTag(buffer, "ul")
 
-	return
+	// Set up the node
+	l.Node.Setup(parent, id)
 }

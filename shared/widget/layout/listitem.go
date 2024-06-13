@@ -1,38 +1,26 @@
 package layout
 
 import (
-	"Domblr/shared/comm"
 	"Domblr/shared/widget"
-	"bytes"
 )
 
 type ListItem struct {
-	Body  widget.Widget
-	Style *widget.Style
-	id    int
+	widget.Node
+	Body widget.Widget
 }
 
-func (listitem *ListItem) Setup(style *widget.Style) {
-	widget.Inherit(&listitem.Style, style)
-	listitem.id = comm.RegisterElement()
-	widget.Setup(listitem.Body, listitem.Style)
-}
-
-func (listitem *ListItem) Design(buffer *bytes.Buffer) widget.Constraint {
-	listitem.Style.Design(buffer, listitem.id, "",
-		map[int]string{},
-		map[string]string{
-			"width":  "fit-content",
-			"height": "fit-content",
+func (li *ListItem) Setup(parent *widget.Node, id int) {
+	li.Node = widget.Node{
+		Structure: widget.Structure{
+			Tag: "li",
 		},
-	)
-	widget.Design(listitem.Body, buffer)
-}
+		Style: &widget.Style{
+			Constraint: widget.Constraint{
+				Width:  widget.SHRINK,
+				Height: widget.SHRINK,
+			},
+		},
+	}
 
-func (listitem *ListItem) Render(buffer *bytes.Buffer) {
-	widget.OpenTag(buffer, "li", "", listitem.id, false)
-	widget.Render(listitem.Body, buffer)
-	widget.CloseTag(buffer, "li")
-
-	return
+	li.Node.Setup(parent, id)
 }

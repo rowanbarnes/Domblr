@@ -5,7 +5,7 @@ import (
 	"Domblr/util"
 )
 
-// FlexList TODO rename
+// FlexList TODO rename or merge with List somehow
 type FlexList struct {
 	widget.Node
 	Items       []widget.Widget
@@ -14,36 +14,34 @@ type FlexList struct {
 	Axis        int
 }
 
-func (list *FlexList) Setup(parent *widget.Node, id int) {
+func (l *FlexList) Setup(parent *widget.Node, id int) {
 	// Set up the node
-	list.Node = widget.Node{
+	l.Node = widget.Node{
 		Structure: widget.Structure{
 			Tag: "div",
 		},
 		Style: &widget.Style{
-			Transform: map[int]string{
-				widget.Background: "background-color",
-			},
-			Custom: map[string]map[string]string{
+			Properties: map[string]map[string]any{
 				"": {
-					"justify-content": "space-between",
-					"align-items":     "center",
-					"flex-direction":  util.If(list.Axis == ROW, "row", "column"),
+					"background-color": widget.Background,
+					"justify-content":  "space-between",
+					"align-items":      "center",
+					"flex-direction":   util.If(l.Axis == ROW, "row", "column"),
 				},
 			},
 			Constraint: widget.Constraint{
-				Width:  util.If(list.Axis == COL, widget.SHRINK, widget.EXPAND),
-				Height: util.If(list.Axis == ROW, widget.SHRINK, widget.EXPAND),
+				Width:  util.If(l.Axis == COL, widget.SHRINK, widget.EXPAND),
+				Height: util.If(l.Axis == ROW, widget.SHRINK, widget.EXPAND),
 			},
 		},
 	}
 
 	// Construct the required children and add them to the node
-	list.Node.AddChild(list.Items...)
-	for i := len(list.Items); i < list.ItemCount; i++ {
-		list.Node.AddChild(list.ItemBuilder(i))
+	l.Node.AddChild(l.Items...)
+	for i := len(l.Items); i < l.ItemCount; i++ {
+		l.Node.AddChild(l.ItemBuilder(i))
 	}
 
 	// Set up the node
-	list.Node.Setup(parent, id)
+	l.Node.Setup(parent, id)
 }

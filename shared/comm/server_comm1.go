@@ -20,5 +20,6 @@ func Call(api string, params ...any) *util.Promise {
 	return promise
 }
 
-func Fetch(url string, body string, then func(body string, err error)) {
+// Fetch stub keeps the compiler happy
+func Fetch(_ ...any) {
 }

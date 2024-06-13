@@ -23,10 +23,13 @@ const (
 )
 
 type Style struct {
+	// Constraint composes the layout constraints into Style
 	Constraint
+	// Properties contains CSS properties in the form:
+	// {`pseudo` : {`property` : inherited variable | `value`}}
+	Properties map[string]map[string]any
+	// inherited style variables
 	inherited map[int]string
-	Transform map[int]string
-	Custom    map[string]map[string]string
 }
 
 func (s *Style) Inherit(parent *Style) {
@@ -43,27 +46,11 @@ func (s *Style) Inherit(parent *Style) {
 	}
 }
 
+// Render
+// TODO optimize the rendering to not create redundant blocks
 func (s *Style) Render(css *bytes.Buffer, id int) {
-	// Write the signature `.s$id{`
-	css.WriteString(".s")
-	css.WriteString(util.ItoABase26(id))
-	css.WriteString("{")
-
-	// Write the transformed inherited styles, only to the base style class
-	for key, property := range s.Transform {
-		if value, ok := s.inherited[key]; ok {
-			css.WriteString(property)
-			css.WriteString(":")
-			css.WriteString(value)
-			css.WriteString(";")
-		}
-	}
-
-	// Close the block `}`
-	css.WriteString("}")
-
 	// Write the custom styles for each pseudo class
-	for pseudo, properties := range s.Custom {
+	for pseudo, v := range s.Properties {
 		// Write the signature `.s$id$pseudo{`
 		css.WriteString(".s")
 		css.WriteString(util.ItoABase26(id))
@@ -71,14 +58,33 @@ func (s *Style) Render(css *bytes.Buffer, id int) {
 		css.WriteString("{")
 
 		// Write the custom styles to the pseudo
-		for property, value := range properties {
+		for property, value := range v {
 			css.WriteString(property)
 			css.WriteString(":")
-			css.WriteString(value)
+
+			// Write either the raw value or inherited variable
+			switch value.(type) {
+			case string:
+				css.WriteString(value.(string))
+			case int:
+				if value, ok := s.inherited[value.(int)]; ok {
+					css.WriteString(value)
+				}
+			}
 			css.WriteString(";")
 		}
 
 		// Close the block `}`
 		css.WriteString("}")
 	}
+
+	// Write the constraint styles
+	css.WriteString(".s")
+	css.WriteString(util.ItoABase26(id))
+	css.WriteString("{")
+	css.WriteString("width:")
+	css.WriteString(util.If(s.Constraint.Width == SHRINK, "fit-content", "100%"))
+	css.WriteString(";width:")
+	css.WriteString(util.If(s.Constraint.Height == SHRINK, "fit-content", "100%"))
+	css.WriteString(";}")
 }

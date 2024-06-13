@@ -11,83 +11,63 @@ type Button struct {
 	OnClick func(button *Button)
 }
 
-func (button *Button) Setup(style *Style) {
-	if button.Style == nil {
-		button.Style = style
+func (b *Button) Setup(parent *Node, id int) {
+	// Set up the node
+	b.Node = Node{
+		Structure: Structure{
+			Tag:     "a",
+			Href:    "#",
+			Onclick: true,
+		},
+		Style: &Style{
+			Constraint: Constraint{
+				Width:  SHRINK,
+				Height: SHRINK,
+			},
+			Properties: map[string]map[string]any{
+				"": {
+					"color":           Foreground,
+					"padding":         Padding,
+					"text-decoration": "none",
+					"position":        "relative",
+				},
+				":hover": {
+					"color": Highlight,
+				},
+				// Underline
+				"::before": {
+					"background-color": Highlight,
+					"content":          "\"\"",
+					"position":         "absolute",
+					"bottom":           "0",
+					"left":             "0",
+					"width":            "100%",
+					"height":           "2px",
+					"transform":        "scaleX(0)",
+					"transition":       "transform 0.2s ease",
+				},
+				":hover::before": {
+					"transform": "scaleX(1)",
+				},
+			},
+		},
 	}
 
-	button.id = comm.RegisterFunc(func() {
-		button.OnClick(button)
+	// Register OnClick
+	comm.RegisterFunc(id, func() {
+		b.OnClick(b)
 	})
+
+	// Setup the node
+	b.Node.Setup(parent, id)
 }
 
-func (button *Button) Design(buffer *bytes.Buffer) Constraint {
-	// Design the button styling
-	button.Style.Design(buffer, button.id, "",
-		map[int]string{
-			Foreground: "color",
-			Padding:    "padding",
-		}, map[string]string{
-			"text-decoration": "none",
-			"position":        "relative",
-		},
-	)
+// SetLabel changes the label of the button and renders the widget
+func (b *Button) SetLabel(Label string) {
+	b.Label = Label
+	var css, html bytes.Buffer
+	b.Render(&css, &html)
 
-	// Design hover styles
-	button.Style.Design(buffer, button.id, ":hover",
-		map[int]string{
-			Highlight: "color",
-		},
-		map[string]string{},
-	)
-
-	// Design underline styling
-	button.Style.Design(buffer, button.id, "::before",
-		map[int]string{
-			Highlight: "background-color",
-		},
-		map[string]string{
-			"content":    "\"\"",
-			"position":   "absolute",
-			"bottom":     "0",
-			"left":       "0",
-			"width":      "100%",
-			"height":     "2px",
-			"transform":  "scaleX(0)",
-			"transition": "transform 0.2s ease",
-		},
-	)
-
-	// Design underline hover style
-	button.Style.Design(buffer, button.id, ":hover::before",
-		map[int]string{},
-		map[string]string{
-			"transform": "scaleX(1)",
-		},
-	)
-	button.Style.Design(buffer, button.id, ":hover::before",
-		map[int]string{},
-		map[string]string{
-			"transform": "scaleX(1)",
-		},
-	)
-
-	return Constraint{
-		Width:  SHRINK,
-		Height: SHRINK,
-	}
-}
-
-func (button *Button) Render(buffer *bytes.Buffer) {
-	OpenTag(buffer, "a", "#", button.id, true)
-	buffer.WriteString(button.Label)
-	CloseTag(buffer, "a")
-	return
-}
-
-func (button *Button) SetLabel(Label string) {
-	button.Label = Label
-	var buffer bytes.Buffer
-	button.Render(&buffer)
-	comm.UpdateWidget(button.id, buffer.String())
+	// TODO: Handle changing css
+	comm.UpdateWidget(b.id, html.String())
 }

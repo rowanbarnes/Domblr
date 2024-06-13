@@ -29,11 +29,11 @@ func (s *Structure) openTag(html *bytes.Buffer, id int) {
 	}
 	html.WriteString(" id=\"")
 	html.WriteString(strconv.Itoa(id))
-	html.WriteString("\" class=\"s")
+	html.WriteString("\" class=\"")
 	html.WriteString(strconv.Itoa(id))
 	html.WriteString("\"")
 	if s.Onclick {
-		html.WriteString("onclick=\"wasm.exports.onclick(")
+		html.WriteString("onclick=\"wasm.exports.invoke(")
 		html.WriteString(strconv.Itoa(id))
 		html.WriteString(")\"")
 	}
