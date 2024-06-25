@@ -1,6 +1,8 @@
 package util
 
-import "sync"
+import (
+	"sync"
+)
 
 type Promise struct {
 	resultChan chan []any
@@ -36,9 +38,13 @@ func (p *Promise) Catch(callback func(error)) *Promise {
 }
 
 func (p *Promise) Resolve(result []any) {
+	println("Promise resolved")
 	p.resultChan <- result
 }
 
 func (p *Promise) Reject(err error) {
-	p.errorChan <- err
+	if err != nil {
+		println("Promise rejected: " + err.Error())
+		p.errorChan <- err
+	}
 }

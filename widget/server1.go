@@ -1,13 +1,74 @@
-package backend
+//go:build !wasm
+
+package widget
 
 import (
-	"Domblr/frontend"
-	"Domblr/shared/comm"
-	"bytes"
+	"Domblr/comm"
+	"Domblr/util"
 	"encoding/json"
+	"io/fs"
 	"net/http"
+	"path/filepath"
 	"strings"
 )
+
+type Server struct {
+	Addr      string
+	ResPath   string
+	ApiRouter comm.ApiRouter
+}
+
+func (server *Server) RunApp(page *App) {
+	buildCtx := &BuildContext{
+		Addr:      server.Addr,
+		ResPath:   server.ResPath,
+		Variables: make(map[int]string),
+		ID:        0,
+	}
+	page.Build(buildCtx)
+
+	// Serve all the files in the res folder on the root
+	err := filepath.Walk(server.ResPath, func(path string, info fs.FileInfo, err error) error {
+		if info.IsDir() {
+			return nil
+		}
+
+		if err != nil {
+			return err
+		}
+
+		// Get the relative path to serve the file
+		relPath, err := filepath.Rel(server.ResPath, path)
+		if err != nil {
+			return err
+		}
+
+		// Define the HTTP handler for the file
+		// TODO: Use Content-Type header for JS/WASM?
+		http.HandleFunc("/"+relPath, func(w http.ResponseWriter, r *http.Request) {
+			http.ServeFile(w, r, path)
+		})
+		return nil
+	})
+	util.Panic(err)
+
+	// Serve the generated application content
+	http.HandleFunc("/api/", server.InvokeRequest)
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		renderCtx := NewRenderContext()
+		page.Render(renderCtx)
+		_, err := w.Write(renderCtx.Buffer.Bytes())
+		if err != nil {
+			return
+		}
+	})
+	err = http.ListenAndServe(server.Addr, nil)
+	util.Panic(err)
+}
+
+func (server *Server) Setup() {
+	comm.Api = server.ApiRouter
+}
 
 // InvokeRequest invokes the request with the given name and parameters
 func (server *Server) InvokeRequest(w http.ResponseWriter, r *http.Request) {
@@ -56,39 +117,4 @@ func (server *Server) InvokeRequest(w http.ResponseWriter, r *http.Request) {
 	}
 	http.StatusText(http.StatusOK)
 	println("jsonResponse: ", jsonResponse)
-}
-
-type Server struct {
-	Addr      string
-	ApiRouter comm.ApiRouter
-}
-
-func (server *Server) Setup() {
-	comm.Api = server.ApiRouter
-}
-
-// Serve begins serving the given application
-func (server *Server) Serve(app *frontend.App) {
-	http.HandleFunc("/wasm_exec.js", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/javascript")
-		http.ServeFile(w, r, "./res/wasm_exec.js")
-	})
-	http.HandleFunc("/main.wasm", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/wasm")
-		http.ServeFile(w, r, "./res/main.wasm")
-	})
-	http.HandleFunc("/api/", server.InvokeRequest)
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		var buffer bytes.Buffer
-		app.URL = r.URL
-		app.Page.Render(&buffer)
-		_, err := w.Write(buffer.Bytes())
-		if err != nil {
-			return
-		}
-	})
-	err := http.ListenAndServe(server.Addr, nil)
-	if err != nil {
-		return
-	}
 }

@@ -27,3 +27,10 @@ func UpdateWidget(id int, html string) {
 			"Element with ID not found: ", js.ValueOf(id).String())
 	}
 }
+
+func PushState(url string) {
+	window := js.Global().Get("window")
+	history := window.Get("history")
+	history.Call("pushState", "", "", "/"+url)
+	println("Pushing state: ", "/"+url)
+}

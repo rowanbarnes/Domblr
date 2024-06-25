@@ -2,4 +2,4 @@ module Domblr
 
 go 1.21
 
-require marwan.io/wasm-fetch v0.1.0
+require github.com/chai2010/webp v1.1.1

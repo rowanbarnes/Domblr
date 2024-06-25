@@ -1,9 +1,8 @@
 package widget
 
 import (
-	"Domblr/shared/comm"
+	"Domblr/comm"
 	"Domblr/util"
-	"bytes"
 )
 
 type Button struct {
@@ -11,11 +10,11 @@ type Button struct {
 	Label   string
 	OnClick func(button *Button)
 	// Style contains Variables for setting the look of widgets
-	// Nullable after Setup
+	// Nullable after Build
 	Style map[int]string
 }
 
-func (b *Button) Setup(parent *Node, id int) error {
+func (b *Button) Build(ctx *BuildContext) error {
 	// Initialize Node
 	b.Node = Node{
 		Structure: Structure{
@@ -54,10 +53,10 @@ func (b *Button) Setup(parent *Node, id int) error {
 			Variables: b.Style,
 		},
 	}
-	util.Panic(b.Node.Setup(parent, id))
+	util.Panic(b.Node.Build(ctx))
 
 	// Register OnClick
-	comm.RegisterFunc(id, func() {
+	comm.RegisterFunc(b.ID, func() {
 		b.OnClick(b)
 	})
 	return nil
@@ -67,9 +66,9 @@ func (b *Button) Setup(parent *Node, id int) error {
 func (b *Button) SetLabel(Label string) {
 	b.Label = Label
 	b.Structure.Inner = Label
-	var css, html bytes.Buffer
-	b.Render(&css, &html)
+	var ctx = NewRenderContext()
+	b.Render(ctx)
 
 	// TODO: Handle changing css
-	comm.UpdateWidget(b.ID, html.String())
+	comm.UpdateWidget(b.ID, ctx.HTML.String())
 }

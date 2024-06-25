@@ -7,14 +7,14 @@ import (
 type Container struct {
 	Node
 	// Body is the contents of the container
-	// Nullable after Setup
+	// Nullable after Build
 	Body Widget
 	// Style contains Variables for setting the look of widgets
-	// Nullable after Setup
+	// Nullable after Build
 	Style map[int]string
 }
 
-func (c *Container) Setup(parent *Node, id int) error {
+func (c *Container) Build(ctx *BuildContext) error {
 	// Initialize the Node
 	c.Node = Node{
 		Structure: Structure{
@@ -30,7 +30,7 @@ func (c *Container) Setup(parent *Node, id int) error {
 		},
 		Children: []Widget{c.Body},
 	}
-	util.Panic(c.Node.Setup(parent, id))
+	util.Panic(c.Node.Build(nil))
 
 	return nil
 }

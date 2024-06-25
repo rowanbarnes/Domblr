@@ -32,7 +32,7 @@ type List struct {
 	Axis        int
 	Type        int
 	// Style contains variables for setting the look of widgets
-	// Nullable after Setup
+	// Nullable after Build
 	Style map[int]string
 }
 
@@ -41,7 +41,7 @@ type listItem struct {
 	Body Widget
 }
 
-func (li *listItem) Setup(parent *Node, id int) error {
+func (li *listItem) Build(ctx *BuildContext) error {
 	// Initialize the Node
 	li.Node = Node{
 		Structure: Structure{
@@ -49,12 +49,12 @@ func (li *listItem) Setup(parent *Node, id int) error {
 		},
 		Children: []Widget{li.Body},
 	}
-	util.Panic(li.Node.Setup(parent, id))
+	util.Panic(li.Node.Build(nil))
 
 	return nil
 }
 
-func (l *List) Setup(parent *Node, id int) error {
+func (l *List) Build(ctx *BuildContext) error {
 	// Ensure ItemBuilder is initialized
 	if l.ItemBuilder == nil && (l.Items == nil || len(l.Items) < l.ItemCount) {
 		return errors.New("list incorrectly declared: ItemBuilder is nil")
@@ -99,7 +99,7 @@ func (l *List) Setup(parent *Node, id int) error {
 		},
 		Children: l.Items,
 	}
-	util.Panic(l.Node.Setup(parent, id))
+	util.Panic(l.Node.Build(ctx))
 
 	return nil
 }

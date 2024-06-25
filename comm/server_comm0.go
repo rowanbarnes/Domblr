@@ -33,7 +33,7 @@ func Call(api string, params ...any) *util.Promise {
 	}
 
 	// Create HTTP request
-	Fetch("http://localhost:8080/api/"+api, string(jsonParams), func(body string, err error) {
+	fetch("http://localhost:8080/api/"+api, string(jsonParams), func(body string, err error) {
 		println("Fetch callback")
 		if err != nil {
 			println("promise.Reject()")
@@ -57,7 +57,7 @@ func Call(api string, params ...any) *util.Promise {
 	return promise
 }
 
-func Fetch(url string, body string, then func(body string, err error)) {
+func fetch(url string, body string, then func(body string, err error)) {
 	println("Fetch()")
 
 	// Create options object for fetch
@@ -94,4 +94,21 @@ func Fetch(url string, body string, then func(body string, err error)) {
 		}
 		return nil
 	}))
+}
+
+func LoadImage(path string) *util.Promise {
+	promise := util.NewPromise()
+
+	// Load image
+	image := js.Global().Get("Image").New()
+	image.Set("src", path)
+
+	// Define the onload function
+	onLoad := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		promise.Resolve([]any{path})
+		return nil
+	})
+	image.Set("onload", onLoad)
+
+	return promise
 }

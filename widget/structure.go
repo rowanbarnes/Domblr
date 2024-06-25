@@ -12,18 +12,19 @@ type Structure struct {
 	Onclick bool
 	// Inner TODO consider making inner a Node instead of part of Structure
 	Inner string
+	Src   string
 }
 
-func (s *Structure) Render(css *bytes.Buffer, html *bytes.Buffer, n *Node) {
+func (s *Structure) Render(ctx *RenderContext, n *Node) {
 	if s.Tag != "" {
-		s.openTag(html, n.ID)
+		s.openTag(ctx.HTML, n.ID)
 	}
-	html.WriteString(s.Inner)
+	ctx.HTML.WriteString(s.Inner)
 	for _, child := range n.Children {
-		child.Render(css, html)
+		child.Render(ctx)
 	}
 	if s.Tag != "" {
-		s.closeTag(html)
+		s.closeTag(ctx.HTML)
 	}
 
 }
@@ -45,6 +46,11 @@ func (s *Structure) openTag(html *bytes.Buffer, id int) {
 		html.WriteString("onclick=\"wasm.exports.invoke(")
 		html.WriteString(strconv.Itoa(id))
 		html.WriteString(")\"")
+	}
+	if s.Src != "" {
+		html.WriteString(" src=\"")
+		html.WriteString(s.Src)
+		html.WriteString("\"")
 	}
 	html.WriteString(">")
 }

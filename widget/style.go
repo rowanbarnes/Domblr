@@ -2,7 +2,6 @@ package widget
 
 import (
 	"Domblr/util"
-	"bytes"
 )
 
 const (
@@ -32,7 +31,7 @@ type Style struct {
 	Variables map[int]string
 }
 
-func (s *Style) Setup(parent *Style) {
+func (s *Style) Build(variables *map[int]string) {
 	// Initialize Properties
 	if s.Properties == nil {
 		s.Properties = make(map[string]map[string]any)
@@ -43,13 +42,13 @@ func (s *Style) Setup(parent *Style) {
 		s.Variables = make(map[int]string)
 	}
 
-	// Handle nil parent
-	if parent == nil {
+	// Handle nil variables
+	if variables == nil {
 		return
 	}
 
 	// Inherit style Variables from the parent
-	for i, p := range parent.Variables {
+	for i, p := range *variables {
 		if _, ok := s.Variables[i]; !ok {
 			s.Variables[i] = p
 		}
@@ -58,45 +57,45 @@ func (s *Style) Setup(parent *Style) {
 
 // Render
 // TODO optimize the rendering to not create redundant blocks
-func (s *Style) Render(css *bytes.Buffer, id int) {
+func (s *Style) Render(ctx *RenderContext, id int) {
 	// Write the custom styles for each pseudo class
 	for pseudo, pseudoProps := range s.Properties {
 		// Write the signature `.s$id$pseudo{`
-		css.WriteString(".")
-		css.WriteString(util.ItoABase26(id))
-		css.WriteString(pseudo)
-		css.WriteString("{")
+		ctx.CSS.WriteString(".")
+		ctx.CSS.WriteString(util.ItoABase26(id))
+		ctx.CSS.WriteString(pseudo)
+		ctx.CSS.WriteString("{")
 
 		// Write the custom styles to the pseudo
 		// Write either the raw string value or the retrieved Variables' variable
 		for property, value := range pseudoProps {
 			switch value.(type) {
 			case string:
-				css.WriteString(property)
-				css.WriteString(":")
-				css.WriteString(value.(string))
-				css.WriteString(";")
+				ctx.CSS.WriteString(property)
+				ctx.CSS.WriteString(":")
+				ctx.CSS.WriteString(value.(string))
+				ctx.CSS.WriteString(";")
 			case int:
 				if varValue, ok := s.Variables[value.(int)]; ok {
-					css.WriteString(property)
-					css.WriteString(":")
-					css.WriteString(varValue)
-					css.WriteString(";")
+					ctx.CSS.WriteString(property)
+					ctx.CSS.WriteString(":")
+					ctx.CSS.WriteString(varValue)
+					ctx.CSS.WriteString(";")
 				}
 			}
 		}
 
 		// Close the block `}`
-		css.WriteString("}")
+		ctx.CSS.WriteString("}")
 	}
 
 	// Write the constraint styles
-	css.WriteString(".")
-	css.WriteString(util.ItoABase26(id))
-	css.WriteString("{")
-	css.WriteString("width:")
-	css.WriteString(util.If(s.Constraint.Width == SHRINK, "fit-content", "100%"))
-	css.WriteString(";height:")
-	css.WriteString(util.If(s.Constraint.Height == SHRINK, "fit-content", "100%"))
-	css.WriteString(";}")
+	ctx.CSS.WriteString(".")
+	ctx.CSS.WriteString(util.ItoABase26(id))
+	ctx.CSS.WriteString("{")
+	ctx.CSS.WriteString("width:")
+	ctx.CSS.WriteString(util.If(s.Constraint.Width == SHRINK, "fit-content", "100%"))
+	ctx.CSS.WriteString(";height:")
+	ctx.CSS.WriteString(util.If(s.Constraint.Height == SHRINK, "fit-content", "100%"))
+	ctx.CSS.WriteString(";}")
 }
